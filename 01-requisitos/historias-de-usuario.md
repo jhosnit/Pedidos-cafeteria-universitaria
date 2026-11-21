@@ -107,7 +107,7 @@
 **Criterios de aceptación**
 
 * **CA-07.1 — Confirmación exitosa.** Dado que mi selección tiene al menos un producto y todos están disponibles, cuando confirmo el pedido, entonces el sistema crea un pedido asociado a mi cuenta en estado **Pendiente**, con fecha de registro, importe total y código de retiro, y me muestra el resumen y el código en pantalla.
-* **CA-07.2 — Código único.** Dado un pedido confirmado, entonces su código tiene 6 caracteres alfanuméricos en mayúsculas, sin 0/O ni 1/I, y no coincide con el de ningún otro pedido.
+* **CA-07.2 — Código único.** Dado un pedido confirmado, entonces su código tiene el formato **LL-DD**: dos letras mayúsculas (A-Z), un guion y dos dígitos (00-99), por ejemplo AB-01, y no coincide con el de ningún otro pedido.
 * **CA-07.3 — Precio congelado.** Dado un pedido confirmado, cuando el personal modifica después el precio de un producto del pedido, entonces el pedido conserva el precio original y su importe total no cambia.
 * **CA-07.4 — Producto que dejó de estar disponible.** Dado que un producto de mi selección dejó de estar disponible, cuando confirmo, entonces el sistema informa cuál es y no crea el pedido. Mi selección se conserva.
 * **CA-07.5 — Precio modificado.** Dado que el precio de un producto cambió desde que armé la selección, cuando confirmo, entonces el sistema informa el nuevo importe, me pide revisarlo y no crea el pedido hasta que vuelva a confirmar. Mi selección se conserva.
@@ -203,13 +203,15 @@
 
 ### HU-15 — Entregar un pedido con el código de retiro
 
-**Como** personal de cafetería, **quiero** registrar un pedido como Entregado solo cuando el cliente presenta su código, **para** evitar confusiones en la entrega.
+**Como** personal de cafetería, **quiero** localizar un pedido con el código que presenta el cliente y registrarlo como Entregado, **para** evitar confusiones en la entrega.
 
 **Criterios de aceptación**
 
-* **CA-15.1 — Entrega exitosa.** Dado un pedido Listo para retirar que selecciono en la lista, cuando ingreso el código correcto que presenta el cliente, entonces el pedido pasa a **Entregado**.
-* **CA-15.2 — Código incorrecto.** Dado un pedido Listo para retirar que selecciono en la lista, cuando ingreso un código que no corresponde a ese pedido, entonces el sistema informa que no coincide y el pedido conserva su estado.
-* **CA-15.3 — Pedido no listo.** Dado un pedido Pendiente o En preparación, cuando intento entregarlo (aunque el código sea correcto), entonces el sistema informa su estado actual y no lo entrega.
-* **CA-15.4 — Código sin distinguir mayúsculas.** Dado un código correcto escrito en minúsculas, entonces el sistema lo acepta.
-* **CA-15.5 — Código vacío.** Dado que no ingreso código, entonces el sistema lo solicita y no entrega el pedido.
-* **CA-15.6 — Estado final.** Dado un pedido Entregado, entonces el sistema informa que ya fue entregado y no admite más cambios de estado.
+* **CA-15.1 — Entrega exitosa.** Dado que el cliente presenta el código de un pedido Listo para retirar, cuando lo ingreso, entonces el sistema localiza el pedido y me muestra su resumen; al confirmar la entrega, el pedido pasa a **Entregado**.
+* **CA-15.2 — Código inexistente.** Dado que ingreso un código que no corresponde a ningún pedido, entonces el sistema informa que no se encontró un pedido con ese código y no modifica ningún pedido.
+* **CA-15.3 — Pedido no listo.** Dado que ingreso el código de un pedido Pendiente o En preparación, entonces el sistema informa su estado actual y no permite entregarlo.
+* **CA-15.4 — Formato tolerante.** Dado un código correcto escrito en minúsculas o sin el guion (por ejemplo ab01), entonces el sistema localiza el pedido.
+* **CA-15.5 — Código vacío.** Dado que no ingreso código, entonces el sistema lo solicita y no busca ningún pedido.
+* **CA-15.6 — Estado final.** Dado que ingreso el código de un pedido Entregado, entonces el sistema informa que ya fue entregado y no admite más cambios de estado.
+* **CA-15.7 — Verificación antes de entregar.** Dado un pedido localizado, entonces veo su código, el nombre y apellido del cliente, los productos, las cantidades y el importe total antes de confirmar, y puedo cancelar sin que el pedido cambie.
+* **CA-15.8 — Cambio concurrente.** Dado que otro usuario ya cambió el estado del pedido, cuando confirmo la entrega, entonces el sistema informa que ya no está Listo para retirar y no realiza cambios.
