@@ -1,4 +1,4 @@
-# Casos de uso — Pedidos de la cafetería universitaria
+# Casos de uso
 
 **Release:** 1.0  
 **Versión del documento:** 1.0  
@@ -14,128 +14,79 @@
 ## 2. Diagramas de casos de uso
 
 ### 2.1 Cliente
-
-```plantuml
-@startuml cu-cliente
-title Casos de uso del Cliente
-left to right direction
-skinparam shadowing false
-skinparam dpi 150
-skinparam defaultFontName Arial
-skinparam packageStyle rectangle
-skinparam usecase {
-  BackgroundColor White
-  BorderColor Black
-}
-skinparam rectangle {
-  BackgroundColor White
-  BorderColor Black
-}
-
-actor Cliente
-
-rectangle "Sistema de pedidos de la cafetería universitaria" {
-  usecase "CU-01 Registrar cuenta de cliente" as CU01
-  usecase "CU-02 Iniciar sesión" as CU02
-  usecase "CU-03 Cerrar sesión" as CU03
-  usecase "CU-05 Consultar menú" as CU05
-  usecase "CU-06 Armar selección y revisar importe" as CU06
-  usecase "CU-07 Confirmar pedido" as CU07
-  usecase "CU-08 Consultar mis pedidos" as CU08
-}
-
-Cliente -- CU01
-Cliente -- CU02
-Cliente -- CU03
-Cliente -- CU05
-Cliente -- CU06
-Cliente -- CU07
-Cliente -- CU08
-
-CU06 .> CU05 : <<extend>>
-@enduml
+ 
+```mermaid
+flowchart LR
+    Cliente(["Cliente"])
+ 
+    subgraph SIS["Sistema de pedidos de la cafetería universitaria"]
+        CU01(["CU-01 Registrar cuenta de cliente"])
+        CU02(["CU-02 Iniciar sesión"])
+        CU03(["CU-03 Cerrar sesión"])
+        CU05(["CU-05 Consultar menú"])
+        CU06(["CU-06 Armar selección y revisar importe"])
+        CU07(["CU-07 Confirmar pedido"])
+        CU08(["CU-08 Consultar mis pedidos"])
+    end
+ 
+    Cliente --- CU01
+    Cliente --- CU02
+    Cliente --- CU03
+    Cliente --- CU05
+    Cliente --- CU06
+    Cliente --- CU07
+    Cliente --- CU08
+ 
+    CU06 -. "«extend»" .-> CU05
 ```
-
+ 
 ### 2.2 Personal de cafetería
-
-```plantuml
-@startuml cu-personal
-title Casos de uso del Personal de cafetería
-left to right direction
-skinparam shadowing false
-skinparam dpi 150
-skinparam defaultFontName Arial
-skinparam packageStyle rectangle
-skinparam usecase {
-  BackgroundColor White
-  BorderColor Black
-}
-skinparam rectangle {
-  BackgroundColor White
-  BorderColor Black
-}
-
-actor "Personal de\ncafetería" as Personal
-
-rectangle "Sistema de pedidos de la cafetería universitaria" {
-  usecase "CU-02 Iniciar sesión" as CU02
-  usecase "CU-03 Cerrar sesión" as CU03
-  usecase "CU-09 Registrar producto" as CU09
-  usecase "CU-10 Actualizar nombre y precio de producto" as CU10
-  usecase "CU-11 Cambiar disponibilidad de producto" as CU11
-  usecase "CU-12 Consultar pedidos recibidos" as CU12
-  usecase "CU-13 Iniciar preparación" as CU13
-  usecase "CU-14 Marcar como listo para retirar" as CU14
-  usecase "CU-15 Entregar pedido" as CU15
-}
-
-Personal -- CU02
-Personal -- CU03
-Personal -- CU09
-Personal -- CU10
-Personal -- CU11
-Personal -- CU12
-Personal -- CU13
-Personal -- CU14
-Personal -- CU15
-
-CU13 .> CU12 : <<extend>>
-CU14 .> CU12 : <<extend>>
-CU15 .> CU12 : <<extend>>
-@enduml
+ 
+```mermaid
+flowchart LR
+    Personal(["Personal de<br/>cafetería"])
+ 
+    subgraph SIS["Sistema de pedidos de la cafetería universitaria"]
+        CU02(["CU-02 Iniciar sesión"])
+        CU03(["CU-03 Cerrar sesión"])
+        CU09(["CU-09 Registrar producto"])
+        CU10(["CU-10 Actualizar nombre y precio de producto"])
+        CU11(["CU-11 Cambiar disponibilidad de producto"])
+        CU12(["CU-12 Consultar pedidos recibidos"])
+        CU13(["CU-13 Iniciar preparación"])
+        CU14(["CU-14 Marcar como listo para retirar"])
+        CU15(["CU-15 Entregar pedido"])
+    end
+ 
+    Personal --- CU02
+    Personal --- CU03
+    Personal --- CU09
+    Personal --- CU10
+    Personal --- CU11
+    Personal --- CU12
+    Personal --- CU13
+    Personal --- CU14
+    Personal --- CU15
+ 
+    CU13 -. "«extend»" .-> CU12
+    CU14 -. "«extend»" .-> CU12
 ```
-
+ 
 ### 2.3 Administrador
-
-```plantuml
-@startuml cu-admin
-title Casos de uso del Administrador
-left to right direction
-skinparam shadowing false
-skinparam dpi 150
-skinparam defaultFontName Arial
-skinparam packageStyle rectangle
-skinparam usecase {
-  BackgroundColor White
-  BorderColor Black
-}
-skinparam rectangle {
-  BackgroundColor White
-  BorderColor Black
-}
-
-actor Administrador
-
-rectangle "Sistema de pedidos de la cafetería universitaria" {
-  usecase "CU-02 Iniciar sesión" as CU02
-  usecase "CU-03 Cerrar sesión" as CU03
-  usecase "CU-04 Registrar cuenta de personal" as CU04
-}
-
-Administrador -- CU02
-Administrador -- CU03
-Administrador -- CU04
-@enduml
+ 
+```mermaid
+flowchart LR
+    Administrador(["Administrador"])
+ 
+    subgraph SIS["Sistema de pedidos de la cafetería universitaria"]
+        CU02(["CU-02 Iniciar sesión"])
+        CU03(["CU-03 Cerrar sesión"])
+        CU04(["CU-04 Registrar cuenta de personal"])
+    end
+ 
+    Administrador --- CU02
+    Administrador --- CU03
+    Administrador --- CU04
 ```
 
 ## 3. Catálogo de casos de uso
@@ -230,7 +181,7 @@ El cliente completa el formulario de registro con sus datos y una contraseña. E
 
 **Actores**
 
-* **Cliente**, **Personal de cafetería** y **Administrador** : usuarios con cuenta registrada.
+* **Cliente**, **Personal de cafetería** y **Administrador**: usuarios con cuenta registrada.
 
 **Descripción**  
 El usuario ingresa su correo y contraseña. El sistema valida las credenciales, identifica el rol de la cuenta, abre la sesión y lo redirige a la vista que corresponde a su rol.
@@ -521,7 +472,7 @@ Desde el resumen de su selección, el cliente revisa y confirma el pedido. El si
 
 *Éxito*
 
-* Se crea un pedido asociado al cliente, en estado **Pendiente**, con fecha de registro, importe total y código de retiro único (6 caracteres alfanuméricos).
+* Se crea un pedido asociado al cliente, en estado **Pendiente**, con fecha de registro, importe total y código de retiro único.
 * Cada detalle del pedido guarda el producto, la cantidad y el precio vigente al confirmar. Ese precio no cambia aunque el menú se modifique después.
 * La selección queda vacía.
 * El cliente ve el resumen y el código, y se le indica que el pago se realiza presencialmente.
@@ -792,7 +743,7 @@ El personal marca un producto como disponible o no disponible directamente desde
 * **Personal de cafetería**: usuario autenticado que revisa los pedidos para atenderlos.
 
 **Descripción**  
-El personal visualiza los pedidos de todos los clientes, por defecto los Pendientes, con opción de filtrar por estado. Desde esta vista inicia los cambios de estado (CU-13, CU-14 y CU-15).
+El personal visualiza los pedidos de todos los clientes, por defecto los Pendientes, con opción de filtrar por estado. Desde esta vista inicia los cambios de estado de preparación (CU-13 y CU-14). La entrega (CU-15) se realiza ingresando el código de retiro.
 
 **Precondiciones**
 
@@ -967,7 +918,7 @@ El cliente presenta su código de retiro en el mostrador. El personal ingresa el
 1. El personal elige **Entregar pedido**.
 2. El sistema solicita el código de retiro.
 3. El personal ingresa el código que presenta el cliente.
-4. El sistema localiza el pedido con ese código  y verifica que su estado sea Listo para retirar.
+4. El sistema valida el formato del código (tolerante a minúsculas y sin guion, CA-15.4), localiza el pedido y verifica que su estado sea Listo para retirar.
 5. El sistema muestra el resumen del pedido (código, nombre y apellido del cliente, productos, cantidades e importe total) y solicita confirmar la entrega.
 6. El personal confirma la entrega.
 7. El sistema verifica nuevamente que el pedido siga Listo para retirar y cambia su estado a Entregado.
