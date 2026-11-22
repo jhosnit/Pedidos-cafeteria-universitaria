@@ -1,18 +1,21 @@
-# Requisitos no funcionales - Pedidos de la cafetería universitaria
+# Requisitos no funcionales
 
 **Release:** 1.0  
-**Versión del documento:** 1.0  
+**Versión del documento:** 1.0
 
-## 1. Requisitos no funcionales y datos iniciales
+## 1. Catálogo de requisitos no funcionales
 
-| ID | Requisito | Cómo se verifica | Origen |
-|----|-----------|------------------|--------|
-| RNF-01 | **Persistencia.** La información de clientes, productos y pedidos se conserva entre ejecuciones. | Registrar datos, reiniciar la aplicación y comprobar que siguen disponibles sin cambios. | Cliente, apartado 8 |
-| RNF-02 | Las contraseñas se almacenan cifradas (hash) y no aparecen en texto plano en la base de datos ni en los registros de la aplicación. | Revisar la tabla de usuarios y los registros tras un registro y un inicio de sesión. | Derivado |
-| RNF-03 | El control de acceso por rol se aplica en el servidor, no solo ocultando opciones en pantalla. | Solicitar directamente la dirección de una vista o acción restringida con un rol sin permiso y comprobar que se deniega. | Derivado |
-| RNF-04 | Las validaciones (formato, rangos y reglas de negocio) se aplican en el servidor aunque la interfaz también las valide. | Enviar datos inválidos sin pasar por la interfaz y comprobar que se rechazan. | Derivado |
-| RNF-05 | La base de datos garantiza la unicidad del código de retiro, del correo, de la cédula o RUC y del nombre de producto. | Intentar registrar duplicados, incluso en dos solicitudes simultáneas, y comprobar que se rechazan. | Cliente (RN-NEG-05) y derivado |
-| RNF-06 | Un pedido y sus detalles se registran de forma atómica: si algo falla, no queda un pedido parcial. | Simular un fallo durante la confirmación y comprobar que no se crea el pedido ni sus detalles. | Derivado |
-| RNF-07 | **Datos iniciales para la demostración.** Una instalación nueva incluye la cuenta del administrador, una cuenta de personal, una cuenta de cliente de prueba y varios productos de ejemplo, al menos uno no disponible. | Ejecutar los scripts de datos iniciales sobre una base vacía y comprobar que los datos existen. | Cliente, apartado 8 («demostrar los procesos y las reglas») |
+| ID | Categoría (ISO 25010) | Requisito | Cómo se verifica | Origen |
+|----|-----------------------|-----------|------------------|--------|
+| RNF-01 | Fiabilidad / Almacenamiento | **Persistencia.** La información de clientes, productos y pedidos se conserva entre ejecuciones mediante la base de datos relacional y volúmenes persistentes. | Registrar datos, reiniciar los contenedores de la aplicación y comprobar que siguen disponibles sin cambios. | Cliente, apartado 8 |
+| RNF-02 | Seguridad / Confidencialidad | **Almacenamiento seguro de contraseñas.** Las contraseñas se almacenan cifradas con algoritmo de hash seguro (BCrypt) y nunca aparecen en texto plano en la base de datos ni en los registros (*logs*) de la aplicación. | Revisar la tabla de usuarios y los registros del servidor tras registrar un usuario o iniciar sesión. | Derivado |
+| RNF-03 | Seguridad / Autorización | **Control de acceso en el servidor.** El control de acceso por rol se aplica estrictamente en el servidor (a través de filtros HTTP / `AuthFilter`), impidiendo accesos no autorizados aunque se invoquen URLs directas. | Solicitar directamente la dirección de una vista o servlet restringido con un rol sin permiso o sin sesión y comprobar que se deniega (código 403 o redirección al login). | Derivado |
+| RNF-04 | Integridad / Robustez | **Validación en el servidor.** Todas las validaciones (formato de correo, cédula/RUC, rangos de cantidades y reglas de negocio) se comprueban en el servidor independientemente de las validaciones en la interfaz web. | Enviar peticiones HTTP con datos inválidos sin pasar por la interfaz gráfica y comprobar que el backend las rechaza. | Derivado |
+| RNF-05 | Integridad de datos | **Garantía de unicidad en base de datos.** El motor de base de datos garantiza la unicidad del código de retiro, correo electrónico, cédula/RUC y nombre de producto mediante restricciones e índices únicos para evitar colisiones por concurrencia. | Intentar registrar duplicados mediante solicitudes concurrentes y comprobar que el motor de base de datos rechaza la segunda operación. | Cliente (RN-NEG-05) y derivado |
+| RNF-06 | Integridad transaccional | **Atomicidad de pedidos.** Un pedido y sus detalles correspondientes se registran de forma atómica en una única transacción de base de datos (ACID): si ocurre cualquier fallo, la transacción se revierte y no se genera ningún registro parcial. | Simular un fallo forzado durante la confirmación y comprobar que no se crea el encabezado del pedido ni detalles huérfanos. | Derivado |
+| RNF-07 | Portabilidad | **Portabilidad y despliegue en contenedores.** La aplicación y la base de datos se ejecutan en contenedores estandarizados mediante Docker Compose (Tomcat 10.1 con Java 25 y PostgreSQL 17), garantizando su funcionamiento en cualquier sistema operativo compatible sin dependencias locales adicionales. | Levantar el entorno en una máquina limpia con `docker compose up --build` y verificar la inicialización correcta de los servicios. | Derivado |
+| RNF-08 | Compatibilidad | **Compatibilidad de clientes web.** La aplicación web es accesible y funcional desde versiones actualizadas de los navegadores web modernos (Google Chrome, Mozilla Firefox, Microsoft Edge) sin requerir instalación de plugins o extensiones. | Acceder y operar el flujo completo de la aplicación desde diferentes navegadores y comprobar su correcta renderización y funcionamiento. | Derivado |
+| RNF-09 | Eficiencia de desempeño | **Tiempo de respuesta.** El tiempo de respuesta del servidor para la consulta del menú, listado de pedidos y transacciones ordinarias debe ser inferior a 2 segundos en condiciones normales de red local. | Medir el tiempo de carga de las vistas principales mediante las herramientas de desarrollo del navegador en un entorno local. | Derivado |
 
-Las credenciales de las cuentas iniciales se documentan en el manual de instalación.
+> [!NOTE]
+> Los **datos iniciales para la demostración** (cuentas de administrador, personal, cliente y productos de ejemplo solicitados en el apartado 8 del cliente) corresponden al aprovisionamiento y despliegue de datos de prueba, por lo que se encuentran documentados en el [manual de instalación](file:///c:/Users/aless/Desktop/Desarrollo/Git/Pedidos-cafeteria-universitaria/Pedidos-cafeteria-universitaria/07-manual-instalacion/manual-instalacion.md) y en el script de base de datos `db/init/02-datos-iniciales.sql`.
