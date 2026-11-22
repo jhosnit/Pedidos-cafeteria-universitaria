@@ -1,4 +1,4 @@
-# Historias de usuario - Pedidos de la cafetería universitaria
+# Historias de usuario
 
 **Release:** 1.0  
 **Versión del documento:** 1.0  
@@ -8,8 +8,8 @@
 | Actor | Descripción |
 |-------|------------|
 | **Cliente** | Estudiante o docente que consulta el menú, registra pedidos y consulta su estado. Debe crear su propia cuenta para poder pedir. |
-| **Personal de cafetería** | Trabajador que mantiene el menú y procesa los pedidos. No se registra por sí mismo, su cuenta la registra el administrador. |
-| **Administrador** | Responsable que registra las cuentas del personal. Su cuenta ya existe en el sistema y no se registra desde la aplicación. |
+| **Personal de cafetería** | Trabajador que mantiene el menú y procesa los pedidos. Su cuenta la registra el administrador. |
+| **Administrador** | Responsable que registra las cuentas del personal. Su cuenta ya existe en el sistema. |
 
 ## 2. Épicas e historias
 
