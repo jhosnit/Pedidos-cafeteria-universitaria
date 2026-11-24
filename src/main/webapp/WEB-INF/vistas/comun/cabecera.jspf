@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><c:out value="${titulo}"/> · Cafetería EPN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+    <link rel="stylesheet" href="${ctx}/assets/app.css">
+</head>
+<body>
+<c:set var="yo" value="${sessionScope.usuario}"/>
+<c:if test="${not empty yo}">
+<header class="barra">
+    <nav class="nav" aria-label="Principal">
+        <a class="marca" href="${ctx}/">cafetería<span>·</span>epn</a>
+        <c:choose>
+            <c:when test="${yo.rol == 'CLIENTE'}">
+                <a class="nav-link ${seccion == 'menu' ? 'activo' : ''}" href="${ctx}/cliente/menu">Menú</a>
+                <a class="nav-link ${seccion == 'seleccion' ? 'activo' : ''}" href="${ctx}/cliente/seleccion">Mi selección
+                    <c:if test="${not empty sessionScope.seleccion and not sessionScope.seleccion.vacia}">
+                        <span class="contador">${sessionScope.seleccion.cantidadProductos}</span>
+                    </c:if>
+                </a>
+                <a class="nav-link ${seccion == 'pedidos' ? 'activo' : ''}" href="${ctx}/cliente/pedidos">Mis pedidos</a>
+            </c:when>
+            <c:when test="${yo.rol == 'PERSONAL'}">
+                <a class="nav-link ${seccion == 'pedidos' ? 'activo' : ''}" href="${ctx}/personal/pedidos">Pedidos</a>
+                <a class="nav-link ${seccion == 'entrega' ? 'activo' : ''}" href="${ctx}/personal/entrega">Entregar</a>
+                <a class="nav-link ${seccion == 'productos' ? 'activo' : ''}" href="${ctx}/personal/productos">Productos</a>
+            </c:when>
+            <c:otherwise>
+                <a class="nav-link activo" href="${ctx}/admin/personal">Personal</a>
+            </c:otherwise>
+        </c:choose>
+        <form class="salir" method="post" action="${ctx}/logout">
+            <span class="quien"><c:out value="${yo.nombre}"/></span>
+            <button type="submit" class="nav-link">Salir</button>
+        </form>
+    </nav>
+</header>
+</c:if>
+<main class="${empty yo ? 'pagina pagina-sola' : 'pagina'}">
+<c:if test="${not empty sessionScope.flashOk}">
+    <p class="aviso aviso-ok" role="status"><c:out value="${sessionScope.flashOk}"/></p>
+    <c:remove var="flashOk" scope="session"/>
+</c:if>
+<c:if test="${not empty sessionScope.flashError}">
+    <p class="aviso aviso-error" role="alert"><c:out value="${sessionScope.flashError}"/></p>
+    <c:remove var="flashError" scope="session"/>
+</c:if>
