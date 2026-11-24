@@ -1,5 +1,7 @@
 package ec.edu.epn.cafeteria.servicio;
 
+import java.math.BigDecimal;
+
 /**
  * Validaciones de formato que se hacen en el servidor aunque el formulario
  * tambien las tenga (RNF-04).
@@ -46,5 +48,24 @@ public final class Validaciones {
      */
     public static boolean contrasena(String contrasena) {
         return contrasena != null && contrasena.length() >= 8;
+    }
+
+    /**
+     * Convierte el precio del formulario. Debe ser mayor que 0 y tener como maximo
+     * dos decimales (CA-09.3). Acepta coma o punto como separador.
+     *
+     * @param texto valor del campo precio
+     * @return el precio con escala 2, o {@code null} si no es valido
+     */
+    public static BigDecimal precio(String texto) {
+        if (texto == null) {
+            return null;
+        }
+        String limpio = texto.trim().replace(',', '.');
+        if (!limpio.matches("\\d{1,6}(\\.\\d{1,2})?")) {
+            return null;
+        }
+        BigDecimal valor = new BigDecimal(limpio);
+        return valor.signum() > 0 ? valor.setScale(2) : null;
     }
 }
