@@ -158,7 +158,7 @@ public class PedidoService {
     /**
      * Pasa el pedido al siguiente estado de preparacion: Pendiente a En preparacion
      * (HU-13) o En preparacion a Listo para retirar (HU-14). La entrega va por
-     * otro flujo porque exige el codigo.
+     * {@link #entregar(int)} porque exige el codigo.
      *
      * @param pedidoId     pedido a avanzar
      * @param estadoActual estado que el personal vio en pantalla
@@ -177,6 +177,44 @@ public class PedidoService {
                     + ". Otro usuario cambió su estado; revisa la lista actualizada.");
         }
         return siguiente;
+    }
+
+    /**
+     * Localiza el pedido que se va a entregar a partir del codigo que presenta el cliente.
+     *
+     * @param codigoTexto codigo escrito por el personal
+     * @return pedido listo para retirar, con sus detalles
+     * @throws ReglaNegocioException si el codigo esta vacio, no existe o el pedido no esta listo
+     */
+    public Pedido buscarParaEntrega(String codigoTexto) {
+        if (Validaciones.vacio(codigoTexto)) {
+            throw new ReglaNegocioException("Ingresa el código de retiro que presenta el cliente.");
+        }
+        String codigo = CodigoRetiro.normalizar(codigoTexto);
+        Pedido pedido = codigo == null ? null : pedidoDao.buscarPorCodigo(codigo);
+        if (pedido == null) {
+            throw new ReglaNegocioException("No se encontró un pedido con el código " + codigoTexto.trim() + ".");
+        }
+        if (pedido.getEstado() == EstadoPedido.ENTREGADO) {
+            throw new ReglaNegocioException("El pedido " + pedido.getCodigoRetiro() + " ya fue entregado.");
+        }
+        if (pedido.getEstado() != EstadoPedido.LISTO_PARA_RETIRAR) {
+            throw new ReglaNegocioException("El pedido " + pedido.getCodigoRetiro() + " está "
+                    + pedido.getEstado().getEtiqueta() + ". Todavía no se puede entregar.");
+        }
+        return pedido;
+    }
+
+    /**
+     * Registra la entrega (RN-NEG-07). Solo funciona si el pedido sigue Listo para retirar.
+     *
+     * @param pedidoId pedido localizado con el codigo
+     * @throws ReglaNegocioException si otro usuario ya cambio el estado
+     */
+    public void entregar(int pedidoId) {
+        if (!pedidoDao.cambiarEstado(pedidoId, EstadoPedido.LISTO_PARA_RETIRAR, EstadoPedido.ENTREGADO)) {
+            throw new ReglaNegocioException("El pedido ya no está Listo para retirar. No se realizaron cambios.");
+        }
     }
 
     private int leerCantidad(String texto) {
