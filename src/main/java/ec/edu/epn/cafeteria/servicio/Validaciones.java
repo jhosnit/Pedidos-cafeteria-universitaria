@@ -51,6 +51,22 @@ public final class Validaciones {
     }
 
     /**
+     * Convierte la cantidad del formulario en entero. Acepta solo enteros entre 1 y
+     * 10;
+     * rechaza vacios, decimales, negativos y letras (CA-05.3).
+     *
+     * @param texto valor del campo cantidad
+     * @return la cantidad, o -1 si no es valida
+     */
+    public static int cantidad(String texto) {
+        if (texto == null || !texto.trim().matches("\\d{1,2}")) {
+            return -1;
+        }
+        int valor = Integer.parseInt(texto.trim());
+        return valor >= 1 && valor <= 10 ? valor : -1;
+    }
+
+    /**
      * Convierte el precio del formulario. Debe ser mayor que 0 y tener como maximo
      * dos decimales (CA-09.3). Acepta coma o punto como separador.
      *
