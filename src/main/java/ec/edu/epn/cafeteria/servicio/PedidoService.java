@@ -14,7 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Reglas del pedido: armar la seleccion, confirmar y consultar (HU-05 a HU-08).
+ * Reglas del pedido: armar la seleccion, confirmar y consultar (HU-05 a HU-08),
+ * y la atencion por parte del personal (HU-12 a HU-15).
  *
  * @since 1.0
  */
@@ -136,6 +137,46 @@ public class PedidoService {
     public Pedido detalleDeCliente(int pedidoId, int clienteId) {
         Pedido pedido = pedidoDao.buscarPorId(pedidoId);
         return pedido != null && pedido.getClienteId() == clienteId ? pedido : null;
+    }
+
+    /**
+     * @param estado estado a filtrar, o {@code null} para todos
+     * @return pedidos del mas antiguo al mas reciente
+     */
+    public List<Pedido> listarPorEstado(EstadoPedido estado) {
+        return pedidoDao.listarPorEstado(estado);
+    }
+
+    /**
+     * @param pedidoId id del pedido
+     * @return el pedido con detalles o {@code null}
+     */
+    public Pedido detalle(int pedidoId) {
+        return pedidoDao.buscarPorId(pedidoId);
+    }
+
+    /**
+     * Pasa el pedido al siguiente estado de preparacion: Pendiente a En preparacion
+     * (HU-13) o En preparacion a Listo para retirar (HU-14). La entrega va por
+     * otro flujo porque exige el codigo.
+     *
+     * @param pedidoId     pedido a avanzar
+     * @param estadoActual estado que el personal vio en pantalla
+     * @return el estado nuevo
+     * @throws ReglaNegocioException si el estado no permite avanzar desde aqui o
+     *                               si otro usuario ya lo cambio
+     */
+    public EstadoPedido avanzar(int pedidoId, EstadoPedido estadoActual) {
+        if (estadoActual != EstadoPedido.PENDIENTE && estadoActual != EstadoPedido.EN_PREPARACION) {
+            throw new ReglaNegocioException("Esta acción no está disponible para el estado "
+                    + estadoActual.getEtiqueta() + ".");
+        }
+        EstadoPedido siguiente = estadoActual.siguiente();
+        if (!pedidoDao.cambiarEstado(pedidoId, estadoActual, siguiente)) {
+            throw new ReglaNegocioException("El pedido ya no está " + estadoActual.getEtiqueta()
+                    + ". Otro usuario cambió su estado; revisa la lista actualizada.");
+        }
+        return siguiente;
     }
 
     private int leerCantidad(String texto) {
