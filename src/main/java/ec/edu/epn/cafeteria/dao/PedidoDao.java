@@ -18,7 +18,8 @@ import java.util.List;
  */
 public class PedidoDao {
 
-    private static final String SELECT_PEDIDO = "SELECT p.id, p.codigo_retiro, p.cliente_id, p.fecha_registro, p.importe_total, p.estado, "
+    private static final String SELECT_PEDIDO =
+            "SELECT p.id, p.codigo_retiro, p.cliente_id, p.fecha_registro, p.importe_total, p.estado, "
             + "u.nombre || ' ' || u.apellido AS nombre_cliente "
             + "FROM pedido p JOIN usuario u ON u.id = p.cliente_id";
 
@@ -27,8 +28,7 @@ public class PedidoDao {
      * falla se hace rollback y no queda nada a medias.
      *
      * @param pedido pedido con codigo, cliente, importe y detalles
-     * @return true si se guardo; false si el codigo de retiro ya existia y hay que
-     *         generar otro
+     * @return true si se guardo; false si el codigo de retiro ya existia y hay que generar otro
      */
     public boolean insertar(Pedido pedido) {
         String sqlPedido = "INSERT INTO pedido (codigo_retiro, cliente_id, importe_total, estado) "
@@ -91,6 +91,49 @@ public class PedidoDao {
     public Pedido buscarPorId(int id) {
         List<Pedido> encontrados = listar(SELECT_PEDIDO + " WHERE p.id = ?", id);
         return encontrados.isEmpty() ? null : conDetalles(encontrados.get(0));
+    }
+
+    /**
+     * Pedidos de la cafeteria, del mas antiguo al mas reciente (CA-12.1).
+     *
+     * @param estado estado a filtrar, o {@code null} para traer todos
+     * @return lista sin detalles
+     */
+    public List<Pedido> listarPorEstado(EstadoPedido estado) {
+        if (estado == null) {
+            return listar(SELECT_PEDIDO + " ORDER BY p.fecha_registro, p.id");
+        }
+        return listar(SELECT_PEDIDO + " WHERE p.estado = ? ORDER BY p.fecha_registro, p.id", estado.name());
+    }
+
+    /**
+     * @param codigoRetiro codigo ya normalizado con formato LL-DD
+     * @return el pedido con sus detalles, o {@code null} si no existe
+     */
+    public Pedido buscarPorCodigo(String codigoRetiro) {
+        List<Pedido> encontrados = listar(SELECT_PEDIDO + " WHERE p.codigo_retiro = ?", codigoRetiro);
+        return encontrados.isEmpty() ? null : conDetalles(encontrados.get(0));
+    }
+
+    /**
+     * Cambia el estado solo si el pedido sigue en el estado esperado. Asi, si dos
+     * personas pulsan el boton a la vez, la segunda no cambia nada (SUP-16).
+     *
+     * @param pedidoId id del pedido
+     * @param desde    estado que se espera que tenga ahora
+     * @param hacia    estado nuevo
+     * @return true si se actualizo; false si otro usuario ya lo habia cambiado
+     */
+    public boolean cambiarEstado(int pedidoId, EstadoPedido desde, EstadoPedido hacia) {
+        String sql = "UPDATE pedido SET estado = ? WHERE id = ? AND estado = ?";
+        try (Connection con = Conexion.obtener(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, hacia.name());
+            ps.setInt(2, pedidoId);
+            ps.setString(3, desde.name());
+            return ps.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new DatosException("No se pudo cambiar el estado del pedido", e);
+        }
     }
 
     private List<Pedido> listar(String sql, Object... parametros) {
