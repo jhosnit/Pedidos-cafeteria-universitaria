@@ -32,7 +32,7 @@ public class AuthFilter extends HttpFilter {
     protected void doFilter(HttpServletRequest req, HttpServletResponse resp, FilterChain chain)
             throws IOException, ServletException {
         String ruta = req.getRequestURI().substring(req.getContextPath().length());
-        Usuario usuario = Web.usuario(req);
+        Usuario usuario = Web.usuarioEnSesion(req);
 
         if (ruta.startsWith("/assets/") || ruta.equals("/favicon.ico")) {
             chain.doFilter(req, resp);
