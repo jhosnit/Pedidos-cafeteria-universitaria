@@ -87,7 +87,7 @@ public class Seleccion implements Serializable {
      * @return importe total con dos decimales
      */
     public BigDecimal getTotal() {
-        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal total = BigDecimal.ZERO.setScale(2);
         for (ItemSeleccion item : items.values()) {
             total = total.add(item.getSubtotal());
         }
