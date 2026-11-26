@@ -25,7 +25,7 @@ public class MisPedidosServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        int clienteId = Web.usuario(req).getId();
+        int clienteId = Web.usuarioEnSesion(req).getId();
         int id = Web.entero(req.getParameter("id"));
         if (id > 0) {
             Pedido pedido = pedidoService.detalleDeCliente(id, clienteId);

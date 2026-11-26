@@ -16,7 +16,7 @@
             <div class="campo">
                 <label for="codigo">Código de retiro</label>
                 <input class="entrada entrada-codigo" id="codigo" name="codigo" maxlength="8" placeholder="AB-01"
-                       autocomplete="off" autofocus value="<c:out value='${codigo}'/>">
+                       autocomplete="off" value="<c:out value='${codigo}'/>">
             </div>
             <div class="acciones">
                 <button class="boton" type="submit">Buscar pedido</button>

@@ -63,7 +63,7 @@ public final class Web {
      * @param req peticion actual
      * @return el usuario en sesion o {@code null}
      */
-    public static Usuario usuario(HttpServletRequest req) {
+    public static Usuario usuarioEnSesion(HttpServletRequest req) {
         var sesion = req.getSession(false);
         return sesion == null ? null : (Usuario) sesion.getAttribute(USUARIO);
     }

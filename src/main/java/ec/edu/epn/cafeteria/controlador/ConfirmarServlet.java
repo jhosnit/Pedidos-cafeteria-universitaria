@@ -40,7 +40,7 @@ public class ConfirmarServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Seleccion sel = SeleccionServlet.seleccion(req);
         try {
-            Pedido pedido = pedidoService.confirmar(sel, Web.usuario(req).getId());
+            Pedido pedido = pedidoService.confirmar(sel, Web.usuarioEnSesion(req).getId());
             req.setAttribute("pedido", pedido);
             Web.mostrar(req, resp, "cliente/confirmado");
         } catch (ReglaNegocioException e) {
