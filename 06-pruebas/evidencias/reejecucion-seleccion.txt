@@ -1,0 +1,11 @@
+[INFO] Running ec.edu.epn.cafeteria.modelo.SeleccionTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.241 s -- in ec.edu.epn.cafeteria.modelo.SeleccionTest
+[INFO] Running ec.edu.epn.cafeteria.servicio.AuthServiceTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.915 s -- in ec.edu.epn.cafeteria.servicio.AuthServiceTest
+[INFO] Running ec.edu.epn.cafeteria.servicio.ProductoServiceTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.042 s -- in ec.edu.epn.cafeteria.servicio.ProductoServiceTest
+[INFO] Running ec.edu.epn.cafeteria.servicio.ValidadorIdentificacionTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 s -- in ec.edu.epn.cafeteria.servicio.ValidadorIdentificacionTest
+[INFO] Results:
+[INFO] Tests run: 34, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
