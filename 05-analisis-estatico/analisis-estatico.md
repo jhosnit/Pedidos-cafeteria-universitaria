@@ -2,7 +2,7 @@
 
 **Release:** 1.0  
 **Versión del documento:** 1.0  
-**Fecha del análisis:** 25/11/2026
+**Fecha de los análisis:** 25/11/2026 (primero) y 26/11/2026 (segundo)
 
 ## 1. Herramienta y configuración
 
@@ -33,20 +33,26 @@ El primer análisis se hizo con todo el código de `feature/estructura-base`, `f
 | Métrica | Resultado |
 |---|---|
 | Puerta de calidad | Aprobada |
-| Bugs (fiabilidad) | 0 · calificación A |
-| Vulnerabilidades (seguridad) | 39 · calificación B |
-| Code smells (mantenibilidad) | 2 · calificación A |
+| Incidencias abiertas | 41 |
+| Seguridad | 39 · calificación B |
+| Fiabilidad | 1 · calificación C |
+| Mantenibilidad | 2 · calificación A |
 | Security hotspots | 0 |
 | Duplicación | 0,8 % |
-| Deuda técnica | 15 min |
+
+SonarQube 26 clasifica cada incidencia por las cualidades de software que afecta, así que una misma incidencia puede contarse en dos columnas. El `autofocus` de la entrega cuenta a la vez en fiabilidad y en mantenibilidad; por eso la suma de las columnas (42) es mayor que el total de incidencias (41).
+
+![Resumen del primer análisis](img/sonar-primer-resumen.png)
+
+![Incidencias del primer análisis](img/sonar-primer-incidencias.png)
 
 ### Hallazgos
 
 | # | Regla | Severidad | Archivo | Descripción |
 |---|---|---|---|---|
 | 1 | java:S1845 | Bloqueante | `controlador/Web.java` | El método `usuario()` se llama igual que la constante `USUARIO` salvo por las mayúsculas; puede confundirse al leer el código. |
-| 2 | Web:S9379 | Mayor | `vistas/personal/entrega.jsp` | El atributo `autofocus` del campo de código puede dificultar el uso con lectores de pantalla. |
-| 3 a 41 | java:S1989 | Menor | Servlets (`doGet`/`doPost`) | Los métodos de los servlets declaran `ServletException` e `IOException` que lanzan `Web.mostrar` y `Web.redirigir`. Sonar los marca porque una excepción sin manejar podría mostrar el detalle del error al usuario. |
+| 2 | Web:S9379 | Media | `vistas/personal/entrega.jsp` | El atributo `autofocus` del campo de código puede dificultar el uso con lectores de pantalla. |
+| 3 a 41 | java:S1989 | Baja | Servlets (`doGet`/`doPost`) | Los métodos de los servlets declaran `ServletException` e `IOException` que lanzan `Web.mostrar` y `Web.redirigir`. Sonar los marca porque una excepción sin manejar podría mostrar el detalle del error al usuario. |
 
 ## 3. Análisis de los hallazgos y solución
 
@@ -58,20 +64,22 @@ El primer análisis se hizo con todo el código de `feature/estructura-base`, `f
 
 ## 4. Segundo análisis (después de las correcciones)
 
+El segundo análisis se hizo el 26/11/2026 sobre `dev` después de integrar `fix/hallazgos-sonarqube`.
+
 | Métrica | Primer análisis | Segundo análisis |
 |---|---|---|
 | Puerta de calidad | Aprobada | Aprobada |
-| Bugs | 0 (A) | 0 (A) |
-| Vulnerabilidades | 39 (B) | 39 (B), aceptadas según la sección 3 |
-| Code smells | 2 (A) | **0 (A)** |
-| Deuda técnica | 15 min | **0 min** |
+| Incidencias abiertas | 41 | **39** |
+| Seguridad | 39 (B) | 39 (B), aceptadas según la sección 3 |
+| Fiabilidad | 1 (C) | **0 (A)** |
+| Mantenibilidad | 2 (A) | **0 (A)** |
 | Duplicación | 0,8 % | 0,8 % |
-| Complejidad ciclomática total | — | 446 |
-| Densidad de comentarios | — | 10,9 % |
+| Complejidad ciclomática total | 446 | 446 |
+| Densidad de comentarios | 10,9 % | 11,0 % |
 
-![Resumen del proyecto en SonarQube](img/sonar-resumen.png)
+![Resumen del segundo análisis](img/sonar-segundo-resumen.png)
 
-![Incidencias abiertas](img/sonar-incidencias.png)
+![Incidencias del segundo análisis: solo quedan las 39 de seguridad aceptadas](img/sonar-segundo-incidencias.png)
 
 ## 5. Observaciones
 
