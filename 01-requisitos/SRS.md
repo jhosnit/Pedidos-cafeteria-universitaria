@@ -215,7 +215,7 @@ El detalle de cada requisito (categoría, origen y verificación) está en `requ
 
 ### 7.5 Historias → casos de uso → commits, diseño, pruebas y evidencia en GitHub
  
-Esta sección se completó revisando el historial del repositorio `jhosnit/Pedidos-cafeteria-universitaria` el 21/11/2026. La columna **Commits** sale del historial de la rama `documentacion`; **Componentes de diseño** sale de `modelo-de-dominio.md`. Las celdas **Pendiente** aún no tienen evidencia y se llenan a medida que avanza el proyecto.
+Esta sección se completó revisando el historial del repositorio `jhosnit/Pedidos-cafeteria-universitaria` el 21/11/2026. La columna **Commits** sale del historial de la rama `documentacion`; **Componentes de diseño** sale de `modelo-de-dominio.md`. Las columnas **Casos de prueba** y **Pull Request** se completaron el 26/11/2026 al cerrar el Release 1.0: los casos CT-xx y CT-Uxx están en `06-pruebas/pruebas.md` y los números son los Pull Request del repositorio. El equipo no usó issues de GitHub; el seguimiento de cada historia se hizo con su rama `feature/*` y el Pull Request revisado por otro integrante.
  
 **Estado del repositorio (21/11/2026)**
  
@@ -244,21 +244,21 @@ Esta sección se completó revisando el historial del repositorio `jhosnit/Pedid
  
 | Historia | Caso de uso | Commits | Componentes de diseño (modelo de dominio) | Casos de prueba | Issue | Pull Request |
 |---|---|---|---|---|---|---|
-| HU-01 | CU-01 | HU: 7c96b6c; CU: 987e639 | Usuario, Cliente | Pendiente | Pendiente | Pendiente |
-| HU-02 | CU-02, CU-03 | HU: 7c96b6c; CU: 987e639, c32292d | Usuario (rol), Cliente, PersonalCafeteria, Administrador | Pendiente | Pendiente | Pendiente |
-| HU-03 | CU-04 | HU: 7c96b6c; CU: 987e639 | Usuario, PersonalCafeteria | Pendiente | Pendiente | Pendiente |
-| HU-04 | CU-05 | HU: 7c96b6c; CU: 987e639 | Producto | Pendiente | Pendiente | Pendiente |
-| HU-05 | CU-06 | HU: 7c96b6c; CU: 987e639 | Seleccion, ItemSeleccion, Producto | Pendiente | Pendiente | Pendiente |
-| HU-06 | CU-06 | HU: 7c96b6c; CU: 987e639 | Seleccion, ItemSeleccion | Pendiente | Pendiente | Pendiente |
-| HU-07 | CU-07 | HU: 7c96b6c, 239c0af; CU: 987e639, c32292d | Pedido, DetallePedido, EstadoPedido, Seleccion, Producto | Pendiente | Pendiente | Pendiente |
-| HU-08 | CU-08 | HU: 7c96b6c; CU: 987e639 | Pedido, DetallePedido, EstadoPedido, Cliente | Pendiente | Pendiente | Pendiente |
-| HU-09 | CU-09 | HU: 7c96b6c; CU: 987e639 | Producto | Pendiente | Pendiente | Pendiente |
-| HU-10 | CU-10 | HU: 7c96b6c; CU: 987e639 | Producto, DetallePedido (precio registrado) | Pendiente | Pendiente | Pendiente |
-| HU-11 | CU-11 | HU: 7c96b6c; CU: 987e639 | Producto | Pendiente | Pendiente | Pendiente |
-| HU-12 | CU-12 | HU: 7c96b6c; CU: 987e639, c32292d | Pedido, EstadoPedido, Cliente | Pendiente | Pendiente | Pendiente |
-| HU-13 | CU-13 | HU: 7c96b6c; CU: 987e639 | Pedido, EstadoPedido | Pendiente | Pendiente | Pendiente |
-| HU-14 | CU-14 | HU: 7c96b6c; CU: 987e639 | Pedido, EstadoPedido | Pendiente | Pendiente | Pendiente |
-| HU-15 | CU-15 | HU: 7c96b6c, 239c0af; CU: 987e639, c32292d | Pedido, EstadoPedido | Pendiente | Pendiente | Pendiente |
+| HU-01 | CU-01 | HU: 7c96b6c; CU: 987e639 | Usuario, Cliente | CT-01, CT-02; CT-U01, CT-U02 | No se usaron issues | #1, #2 |
+| HU-02 | CU-02, CU-03 | HU: 7c96b6c; CU: 987e639, c32292d | Usuario (rol), Cliente, PersonalCafeteria, Administrador | CT-03 a CT-07; CT-U02 | No se usaron issues | #1, #2, #7 |
+| HU-03 | CU-04 | HU: 7c96b6c; CU: 987e639 | Usuario, PersonalCafeteria | CT-08, CT-09; CT-U02 | No se usaron issues | #2 |
+| HU-04 | CU-05 | HU: 7c96b6c; CU: 987e639 | Producto | CT-10 | No se usaron issues | #4 |
+| HU-05 | CU-06 | HU: 7c96b6c; CU: 987e639 | Seleccion, ItemSeleccion, Producto | CT-11, CT-12; CT-U04, CT-U06 | No se usaron issues | #5 |
+| HU-06 | CU-06 | HU: 7c96b6c; CU: 987e639 | Seleccion, ItemSeleccion | CT-12, CT-13; CT-U04 | No se usaron issues | #5 |
+| HU-07 | CU-07 | HU: 7c96b6c, 239c0af; CU: 987e639, c32292d | Pedido, DetallePedido, EstadoPedido, Seleccion, Producto | CT-14 a CT-16; CT-U05, CT-U06 | No se usaron issues | #5 |
+| HU-08 | CU-08 | HU: 7c96b6c; CU: 987e639 | Pedido, DetallePedido, EstadoPedido, Cliente | CT-17; CT-U06 | No se usaron issues | #5 |
+| HU-09 | CU-09 | HU: 7c96b6c; CU: 987e639 | Producto | CT-18, CT-19; CT-U03 | No se usaron issues | #4 |
+| HU-10 | CU-10 | HU: 7c96b6c; CU: 987e639 | Producto, DetallePedido (precio registrado) | CT-16; CT-U03 | No se usaron issues | #4 |
+| HU-11 | CU-11 | HU: 7c96b6c; CU: 987e639 | Producto | CT-20; CT-U03 | No se usaron issues | #4 |
+| HU-12 | CU-12 | HU: 7c96b6c; CU: 987e639, c32292d | Pedido, EstadoPedido, Cliente | CT-21; CT-U08 | No se usaron issues | #6 |
+| HU-13 | CU-13 | HU: 7c96b6c; CU: 987e639 | Pedido, EstadoPedido | CT-22; CT-U07, CT-U08 | No se usaron issues | #6 |
+| HU-14 | CU-14 | HU: 7c96b6c; CU: 987e639 | Pedido, EstadoPedido | CT-23; CT-U07, CT-U08 | No se usaron issues | #6 |
+| HU-15 | CU-15 | HU: 7c96b6c, 239c0af; CU: 987e639, c32292d | Pedido, EstadoPedido | CT-24 a CT-27; CT-U05, CT-U08 | No se usaron issues | #6, #7 |
 
 ## 8. Historial del documento
 
