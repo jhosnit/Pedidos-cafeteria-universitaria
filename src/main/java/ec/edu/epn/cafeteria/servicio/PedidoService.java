@@ -1,0 +1,228 @@
+package ec.edu.epn.cafeteria.servicio;
+
+import ec.edu.epn.cafeteria.dao.PedidoDao;
+import ec.edu.epn.cafeteria.dao.ProductoDao;
+import ec.edu.epn.cafeteria.modelo.DetallePedido;
+import ec.edu.epn.cafeteria.modelo.EstadoPedido;
+import ec.edu.epn.cafeteria.modelo.ItemSeleccion;
+import ec.edu.epn.cafeteria.modelo.Pedido;
+import ec.edu.epn.cafeteria.modelo.Producto;
+import ec.edu.epn.cafeteria.modelo.ReglaNegocioException;
+import ec.edu.epn.cafeteria.modelo.Seleccion;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Reglas del pedido: armar la seleccion, confirmar y consultar (HU-05 a HU-08),
+ * y la atencion por parte del personal (HU-12 a HU-15).
+ *
+ * @since 1.0
+ */
+public class PedidoService {
+
+    /** Intentos para encontrar un codigo libre antes de rendirse. */
+    private static final int INTENTOS_CODIGO = 50;
+
+    private final PedidoDao pedidoDao;
+    private final ProductoDao productoDao;
+
+    public PedidoService() {
+        this(new PedidoDao(), new ProductoDao());
+    }
+
+    /**
+     * @param pedidoDao   dao de pedidos
+     * @param productoDao dao de productos, para revisar precio y disponibilidad vigentes
+     */
+    public PedidoService(PedidoDao pedidoDao, ProductoDao productoDao) {
+        this.pedidoDao = pedidoDao;
+        this.productoDao = productoDao;
+    }
+
+    /**
+     * Agrega un producto a la seleccion despues de validar la cantidad.
+     *
+     * @param seleccion     seleccion guardada en la sesion
+     * @param productoId    producto elegido
+     * @param cantidadTexto cantidad tal como llega del formulario
+     * @throws ReglaNegocioException si la cantidad no es valida o el producto no se puede pedir
+     */
+    public void agregar(Seleccion seleccion, int productoId, String cantidadTexto) {
+        int cantidad = leerCantidad(cantidadTexto);
+        Producto producto = productoDao.buscarPorId(productoId);
+        if (producto == null) {
+            throw new ReglaNegocioException("El producto no existe.");
+        }
+        seleccion.agregar(producto, cantidad);
+    }
+
+    /**
+     * @param seleccion     seleccion guardada en la sesion
+     * @param productoId    producto a modificar
+     * @param cantidadTexto nueva cantidad
+     * @throws ReglaNegocioException si la cantidad no es valida
+     */
+    public void cambiarCantidad(Seleccion seleccion, int productoId, String cantidadTexto) {
+        seleccion.cambiarCantidad(productoId, leerCantidad(cantidadTexto));
+    }
+
+    /**
+     * Confirma el pedido. Antes de guardar vuelve a revisar en la base que cada
+     * producto siga disponible y con el mismo precio (CA-07.4, CA-07.5). Si algo
+     * cambio, no crea el pedido y la seleccion se conserva.
+     *
+     * @param seleccion seleccion del cliente
+     * @param clienteId id del cliente en sesion
+     * @return el pedido creado, con su codigo de retiro
+     * @throws ReglaNegocioException si la seleccion esta vacia, un producto ya no esta
+     *                               disponible o algun precio cambio
+     */
+    public Pedido confirmar(Seleccion seleccion, int clienteId) {
+        if (seleccion.isVacia()) {
+            throw new ReglaNegocioException("Tu selección está vacía. Agrega al menos un producto.");
+        }
+        List<String> preciosCambiados = new ArrayList<>();
+        for (ItemSeleccion item : seleccion.getItems()) {
+            Producto actual = productoDao.buscarPorId(item.getProductoId());
+            if (actual == null || !actual.isDisponible()) {
+                throw new ReglaNegocioException("El producto " + item.getNombre()
+                        + " ya no está disponible. Quítalo de tu selección para continuar.");
+            }
+            // compareTo y no equals: equals tambien compara la escala (2.5 no es igual a 2.50)
+            if (actual.getPrecio().compareTo(item.getPrecio()) != 0) {
+                preciosCambiados.add(item.getNombre());
+                item.setPrecio(actual.getPrecio());
+            }
+        }
+        if (!preciosCambiados.isEmpty()) {
+            throw new ReglaNegocioException("Cambió el precio de: " + String.join(", ", preciosCambiados)
+                    + ". El nuevo total es $" + seleccion.getTotal() + ". Revísalo y vuelve a confirmar.");
+        }
+
+        Pedido pedido = new Pedido();
+        pedido.setClienteId(clienteId);
+        pedido.setEstado(EstadoPedido.PENDIENTE);
+        pedido.setImporteTotal(seleccion.getTotal());
+        for (ItemSeleccion item : seleccion.getItems()) {
+            pedido.getDetalles().add(new DetallePedido(item.getProductoId(), item.getNombre(),
+                    item.getCantidad(), item.getPrecio()));
+        }
+        for (int i = 0; i < INTENTOS_CODIGO; i++) {
+            pedido.setCodigoRetiro(CodigoRetiro.generar());
+            if (pedidoDao.insertar(pedido)) {
+                seleccion.vaciar();
+                return pedido;
+            }
+        }
+        // Con 67.600 codigos posibles esto solo pasaria si casi se agotan (SUP-21)
+        throw new ReglaNegocioException("No se pudo generar un código de retiro. Intenta de nuevo.");
+    }
+
+    /**
+     * @param clienteId id del cliente en sesion
+     * @return sus pedidos, del mas reciente al mas antiguo
+     */
+    public List<Pedido> misPedidos(int clienteId) {
+        return pedidoDao.listarPorCliente(clienteId);
+    }
+
+    /**
+     * Detalle de un pedido solo si pertenece al cliente (CA-08.2).
+     *
+     * @param pedidoId  pedido solicitado
+     * @param clienteId cliente en sesion
+     * @return el pedido, o {@code null} si no existe o es de otra persona
+     */
+    public Pedido detalleDeCliente(int pedidoId, int clienteId) {
+        Pedido pedido = pedidoDao.buscarPorId(pedidoId);
+        return pedido != null && pedido.getClienteId() == clienteId ? pedido : null;
+    }
+
+    /**
+     * @param estado estado a filtrar, o {@code null} para todos
+     * @return pedidos del mas antiguo al mas reciente
+     */
+    public List<Pedido> listarPorEstado(EstadoPedido estado) {
+        return pedidoDao.listarPorEstado(estado);
+    }
+
+    /**
+     * @param pedidoId id del pedido
+     * @return el pedido con detalles o {@code null}
+     */
+    public Pedido detalle(int pedidoId) {
+        return pedidoDao.buscarPorId(pedidoId);
+    }
+
+    /**
+     * Pasa el pedido al siguiente estado de preparacion: Pendiente a En preparacion
+     * (HU-13) o En preparacion a Listo para retirar (HU-14). La entrega va por
+     * {@link #entregar(int)} porque exige el codigo.
+     *
+     * @param pedidoId     pedido a avanzar
+     * @param estadoActual estado que el personal vio en pantalla
+     * @return el estado nuevo
+     * @throws ReglaNegocioException si el estado no permite avanzar desde aqui o
+     *                               si otro usuario ya lo cambio
+     */
+    public EstadoPedido avanzar(int pedidoId, EstadoPedido estadoActual) {
+        if (estadoActual != EstadoPedido.PENDIENTE && estadoActual != EstadoPedido.EN_PREPARACION) {
+            throw new ReglaNegocioException("Esta acción no está disponible para el estado "
+                    + estadoActual.getEtiqueta() + ".");
+        }
+        EstadoPedido siguiente = estadoActual.siguiente();
+        if (!pedidoDao.cambiarEstado(pedidoId, estadoActual, siguiente)) {
+            throw new ReglaNegocioException("El pedido ya no está " + estadoActual.getEtiqueta()
+                    + ". Otro usuario cambió su estado; revisa la lista actualizada.");
+        }
+        return siguiente;
+    }
+
+    /**
+     * Localiza el pedido que se va a entregar a partir del codigo que presenta el cliente.
+     *
+     * @param codigoTexto codigo escrito por el personal
+     * @return pedido listo para retirar, con sus detalles
+     * @throws ReglaNegocioException si el codigo esta vacio, no existe o el pedido no esta listo
+     */
+    public Pedido buscarParaEntrega(String codigoTexto) {
+        if (Validaciones.vacio(codigoTexto)) {
+            throw new ReglaNegocioException("Ingresa el código de retiro que presenta el cliente.");
+        }
+        String codigo = CodigoRetiro.normalizar(codigoTexto);
+        Pedido pedido = codigo == null ? null : pedidoDao.buscarPorCodigo(codigo);
+        if (pedido == null) {
+            throw new ReglaNegocioException("No se encontró un pedido con el código " + codigoTexto.trim() + ".");
+        }
+        if (pedido.getEstado() == EstadoPedido.ENTREGADO) {
+            throw new ReglaNegocioException("El pedido " + pedido.getCodigoRetiro() + " ya fue entregado.");
+        }
+        if (pedido.getEstado() != EstadoPedido.LISTO_PARA_RETIRAR) {
+            throw new ReglaNegocioException("El pedido " + pedido.getCodigoRetiro() + " está "
+                    + pedido.getEstado().getEtiqueta() + ". Todavía no se puede entregar.");
+        }
+        return pedido;
+    }
+
+    /**
+     * Registra la entrega (RN-NEG-07). Solo funciona si el pedido sigue Listo para retirar.
+     *
+     * @param pedidoId pedido localizado con el codigo
+     * @throws ReglaNegocioException si otro usuario ya cambio el estado
+     */
+    public void entregar(int pedidoId) {
+        if (!pedidoDao.cambiarEstado(pedidoId, EstadoPedido.LISTO_PARA_RETIRAR, EstadoPedido.ENTREGADO)) {
+            throw new ReglaNegocioException("El pedido ya no está Listo para retirar. No se realizaron cambios.");
+        }
+    }
+
+    private int leerCantidad(String texto) {
+        int cantidad = Validaciones.cantidad(texto);
+        if (cantidad < 0) {
+            throw new ReglaNegocioException("La cantidad debe ser un número entero entre 1 y "
+                    + Seleccion.CANTIDAD_MAXIMA + ".");
+        }
+        return cantidad;
+    }
+}
